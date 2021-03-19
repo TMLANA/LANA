@@ -208,8 +208,6 @@ end
 Start_Bot()
 function CheckBotA(msg)
 W = msg.sender_user_id_
-if not redis:get(boss..'Subscribe:'..W) then
-redis:setex(boss..'Subscribe:'..W,900,true)
 local UserChaneel = redis:get(boss..":UserNameChaneel")
 if UserChaneel then
 local url , res = https.request(ApiToken..'/getchatmember?chat_id='..UserChaneel..'&user_id='..W)
@@ -221,7 +219,6 @@ return "🚸 | عـزيـزي آشـترگ بآلقنآ‌‏هہ آولآ ["..U
 end
 else
 return "🚸 | عـزيـزي آشـترگ بآلقنآ‌‏هہ آولآ ["..UserChaneel.."] \n🔛 | لـكـي تـسـتـطـيـع الـتـحـكـم فـي الـبـوت ."
-end
 end
 end
 return false
