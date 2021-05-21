@@ -63,7 +63,7 @@ chmod +x ./TG
 if [ "$1" == "R" ]; then
 while true; do
 sleep 1s
-rm -fr ./MES
+rm -fr ./LANA
 sudo rm -fr ~/.telegram-cli
 ./TG -s ./inc/Run.lua --bot=$TOKEN
 done
