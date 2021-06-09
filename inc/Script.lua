@@ -38,13 +38,20 @@ if redis:get(boss..'lock_id'..msg.chat_id_) then
 GetUserID(msg.sender_user_id_,function(arg,data)
 
 local msgs = redis:get(boss..'msgs:'..msg.sender_user_id_..':'..msg.chat_id_) or 1
-if data.username_ then UserNameID = "🎫꒐ مـعرفك •⊱ @"..data.username_.." ⊰•\n" else UserNameID = "" end
+if data.username_ then UserNameID = "• 𝙐𝙎𝙀𝙍𝙉𝘼𝙈𝙀 ➤@"..data.username_.." ⊰•\n" else UserNameID = "" end
 if data.username_ then UserNameID1 = "@"..data.username_ else UserNameID1 = "لا يوجد" end
 if data.last_name_ then Name = data.first_name_ .." "..data.last_name_ else Name = data.first_name_ end
 local Namei = FlterName(data,20)
 if data.status_.ID == "UserStatusEmpty" then
-sendMsg(arg.chat_id_,data.id_,'- لا يمكنني عرض صورة بروفايلك لانك قمت بحظر البوت ... !\n\n')
+sendMsg(arg.chat_id_,data.id_,' لا يمكنني عرض صورة بروفايلك لانك قمت بحظر البوت ... !\n\n')
 else
+local infouser = https.request("https://api.telegram.org/bot"..Token.."/getChat?chat_id="..msg.sender_user_id_)
+local info_ = JSON.decode(infouser)
+if info_.result.bio then
+biouser = info_.result.bio
+else
+biouser = 'لا يوجد '
+end
 
 GetPhotoUser(data.id_,function(arg,data)
 local edited = (redis:get(boss..':edited:'..arg.chat_id_..':'..arg.sender_user_id_) or 0)
@@ -67,6 +74,7 @@ KleshaID = KleshaID:gsub("{التفاعل}",Get_Ttl(arg.msgs))
 KleshaID = KleshaID:gsub("{الرسائل}",arg.msgs)
 KleshaID = KleshaID:gsub("{التعديل}",edited)
 KleshaID = KleshaID:gsub("{النقاط}",points)
+KleshaID = KleshaID:gsub("{بايو}",biouser)
 KleshaID = KleshaID:gsub("{البوت}",redis:get(boss..':NameBot:'))
 KleshaID = KleshaID:gsub("{المطور}",SUDO_USER)
 KleshaID = KleshaID:gsub("{الردود}",RandomText())
@@ -1459,6 +1467,33 @@ redis:setex(boss..'WiCmdLink'..msg.chat_id_..msg.sender_user_id_,500,true)
 return '- حسننا عزيزي\n- الان ارسل  رابط مجموعتك ؛'
 end
 
+if MsgText[1] == 'البايو' and msg.Admin then
+  if msg.reply_id then 
+    function get(mr,EIKOei)
+      if not EIKOei.sender_user_id_ then
+        return false
+      end
+      local infouser = https.request("https://api.telegram.org/bot"..Token.."/getChat?chat_id="..EIKOei.sender_user_id_)
+      local info_ = JSON.decode(infouser)
+      if info_.result.bio then
+        biouser = info_.result.bio
+      else
+        biouser = 'لا يوجد '
+      end
+      sendMsg(msg.chat_id_,msg.id_,biouser)
+    end
+    GetMsgInfo(msg.chat_id_,msg.reply_id,get,nil)
+  else
+    local infouser = https.request("https://api.telegram.org/bot"..Token.."/getChat?chat_id="..msg.sender_user_id_)
+    local info_ = JSON.decode(infouser)
+    if info_.result.bio then
+      biouser = info_.result.bio
+    else
+      biouser = 'لا يوجد '
+    end
+    sendMsg(msg.chat_id_,msg.id_,biouser)
+  end
+end
 if MsgText[1] == "انشاء رابط" then
 if not msg.Creator then return "- هذا الامر يخص {المطور,المنشئ الاساسي ,المنشئ} فقط  \n" end
 if not redis:get(boss..'ExCmdLink'..msg.chat_id_) then
@@ -2413,7 +2448,7 @@ end
 ---=================================================================================
 
 if MsgText[1] == "رفع منشئ اساسي" or MsgText[1] == "رفع منشى اساسي" then
-if not msg.Malk then return "- هذا الامر يخص {المطور,المالك} فقط  \n" end
+if not msg.SuperCreator then return "- هذا الامر يخص {المطور,المالك} فقط  \n" end
 
 if not MsgText[2] and msg.reply_id then 
 GetMsgInfo(msg.chat_id_,msg.reply_id,function(arg,data)
@@ -2459,7 +2494,7 @@ return false
 end
 
 if MsgText[1] == "تنزيل منشئ اساسي" or MsgText[1] == "تنزيل منشى اساسي" then
-if not msg.Malk then return "- هذا الامر يخص {المطور,المالك} فقط  \n" end
+if not msg.SuperCreator then return "- هذا الامر يخص {المطور,المالك} فقط  \n" end
 
 if not MsgText[2] and msg.reply_id then 
 GetMsgInfo(msg.chat_id_,msg.reply_id,function(arg,data)
@@ -5502,6 +5537,7 @@ local welcome = welcome:gsub("{الرتبه}",gtupe)
 local welcome = welcome:gsub("{التفاعل}",Get_Ttl(msgs))
 local welcome = welcome:gsub("{الرسائل}",msgs)
 local welcome = welcome:gsub("{النقاط}",points)
+local welcome = welcome:gsub("{بايو}",biouser)
 local welcome = welcome:gsub("{التعديل}",edited)
 local welcome = welcome:gsub("{البوت}",redis:get(boss..':NameBot:'))
 local welcome = welcome:gsub("{المطور}",SUDO_USER)
@@ -5530,6 +5566,7 @@ local welcome = welcome:gsub("{الرتبه}",msg.TheRank)
 local welcome = welcome:gsub("{التفاعل}",Get_Ttl(msgs))
 local welcome = welcome:gsub("{الرسائل}",msgs)
 local welcome = welcome:gsub("{النقاط}",points)
+local welcome = welcome:gsub("{بايو}",biouser)
 local welcome = welcome:gsub("{التعديل}",edited)
 local welcome = welcome:gsub("{البوت}",redis:get(boss..':NameBot:'))
 local welcome = welcome:gsub("{المطور}",SUDO_USER)
